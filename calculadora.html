@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Organizada</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .btn-press {
+            transform: scale(0.9);
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .btn-hover:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 h-screen flex items-center justify-center">
+    <div class="bg-white rounded-3xl shadow-2xl p-6 w-80">
+        <!-- Display -->
+        <input 
+            type="text" 
+            id="display" 
+            class="w-full h-16 text-4xl text-right px-5 rounded-2xl border border-gray-200 mb-5 focus:border-blue-500" 
+            readonly
+            autofocus
+        >
+
+        <!-- Botões -->
+        <div class="grid grid-cols-4 gap-3">
+            <!-- Linha 1: Funções Especiais -->
+            <button class="w-15 h-12 bg-red-500 rounded-xl text-white shadow-lg btn-hover col-span-1" data-key="escape" onclick="clearDisplay()">C</button>
+            <button class="btn bg-gray-200 rounded-xl shadow-lg btn-hover col-span-1" data-key="%" onclick="percentage()">%</button>
+            <button class="btn bg-gray-200 rounded-xl shadow-lg btn-hover col-span-1" data-key="r" onclick="squareRoot()">√</button>
+            <button class="btn bg-blue-500 text-white rounded-xl shadow-lg btn-hover col-span-1" data-key="/" onclick="addToDisplay('/')">/</button>
+
+            <!-- Linha 2: Números e Multiplicação -->
+            <button class="w-15 h-12 btn bg-gray-200 rounded-xl shadow-lg btn-hover col-span-1" data-key="7" onclick="addToDisplay('7')">7</button>
+            <button class="btn bg-gray-200 rounded-xl shadow-lg btn-hover col-span-1" data-key="8" onclick="addToDisplay('8')">8</button>
+            <button class="btn bg-gray-200 rounded-xl shadow-lg btn-hover col-span-1" data-key="9" onclick="addToDisplay('9')">9</button>
+            <button class="btn bg-blue-500 text-white rounded-xl shadow-lg btn-hover col-span-1" data-key="*" onclick="addToDisplay('*')">×</button>
+
+            <!-- Linha 3: Números e Subtração -->
+            <button class="w-15 h-12 btn bg-gray-200 rounded-xl shadow-lg btn-hover col-span-1" data-key="4" onclick="addToDisplay('4')">4</button>
+            <button class="btn bg-gray-200 rounded-xl shadow-lg btn-hover col-span-1" data-key="5" onclick="addToDisplay('5')">5</button>
+            <button class="btn bg-gray-200 rounded-xl shadow-lg btn-hover col-span-1" data-key="6" onclick="addToDisplay('6')">6</button>
+            <button class="btn bg-blue-500 text-white rounded-xl shadow-lg btn-hover col-span-1" data-key="-" onclick="addToDisplay('-')">−</button>
+
+            <!-- Linha 4: Números e Adição -->
+            <button class="w-15 h-12 btn bg-gray-200 rounded-xl shadow-lg btn-hover col-span-1" data-key="1" onclick="addToDisplay('1')">1</button>
+            <button class="btn bg-gray-200 rounded-xl shadow-lg btn-hover col-span-1" data-key="2" onclick="addToDisplay('2')">2</button>
+            <button class="btn bg-gray-200 rounded-xl shadow-lg btn-hover col-span-1" data-key="3" onclick="addToDisplay('3')">3</button>
+            <button class="btn bg-blue-500 text-white rounded-xl shadow-lg btn-hover col-span-1" data-key="+" onclick="addToDisplay('+')">+</button>
+
+            <!-- Linha 5: Zero, Decimal e Igual -->
+            <button class="w-15 h-12 btn bg-gray-200 rounded-xl shadow-lg btn-hover col-span-2" data-key="0" onclick="addToDisplay('0')">0</button>
+            <button class="btn bg-gray-200 rounded-xl shadow-lg btn-hover col-span-1" data-key="." onclick="addToDisplay('.')">.</button>
+            <button class="btn bg-green-500 text-white rounded-xl shadow-lg btn-hover col-span-1" data-key="enter" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <script>
+        // Adiciona valor ao display
+        function addToDisplay(value) {
+            const display = document.getElementById('display');
+            if (value === '.' && display.value.includes('.')) return;
+            display.value += value;
+        }
+
+        // Limpa o display
+        function clearDisplay() {
+            document.getElementById('display').value = '';
+        }
+
+        // Calcula o resultado
+        function calculate() {
+            const display = document.getElementById('display');
+            try {
+                display.value = eval(display.value);
+            } catch (error) {
+                display.value = 'Erro';
+                setTimeout(() => display.value = '', 1000);
+            }
+        }
+
+        // Calcula porcentagem
+        function percentage() {
+            const display = document.getElementById('display');
+            display.value = parseFloat(display.value) / 100;
+        }
+
+        // Calcula raiz quadrada
+        function squareRoot() {
+            const display = document.getElementById('display');
+            const value = parseFloat(display.value);
+            if (value < 0) {
+                display.value = 'Erro';
+                setTimeout(() => display.value = '', 1000);
+            } else {
+                display.value = Math.sqrt(value);
+            }
+        }
+
+        // Suporte ao teclado
+        document.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            
+            // Trata Enter e Escape primeiro
+            if (key === 'enter') {
+                e.preventDefault();
+                calculate();
+                return;
+            }
+            if (key === 'escape') {
+                e.preventDefault();
+                clearDisplay();
+                return;
+            }
+
+            // Trata Backspace
+            if (key === 'backspace') {
+                e.preventDefault();
+                document.getElementById('display').value = 
+                    document.getElementById('display').value.slice(0, -1);
+                return;
+            }
+
+            // Trata outros botões
+            const button = document.querySelector(`button[data-key="${key}"]`);
+            if (button) {
+                e.preventDefault();
+                button.classList.add('btn-press');
+                setTimeout(() => button.classList.remove('btn-press'), 150);
+                button.click();
+            }
+        });
+    </script>
+</body>
+</html>
